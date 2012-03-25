@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<stringAttribute key="bad_container_name" value="\kendzi.josm.plugin3d.title\RenderTitleTest"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/kendzi.josm.plugin3d.title/src/kendzi/josm/kendzi3d/title/RenderTitleMain.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="kendzi.josm.kendzi3d.title.RenderTitleMain"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="kendzi.josm.plugin3d.title"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djogl.debug.GraphicsConfiguration=true"/>
+</launchConfiguration>
