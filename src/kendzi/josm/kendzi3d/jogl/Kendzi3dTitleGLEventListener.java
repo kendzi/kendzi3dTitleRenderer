@@ -22,6 +22,8 @@ import kendzi.jogl.model.render.ModelRender;
 import kendzi.josm.kendzi3d.jogl.model.ground.Ground;
 import kendzi.josm.kendzi3d.jogl.model.roof.mk.ui.CameraMoveListener;
 import kendzi.josm.kendzi3d.jogl.model.roof.mk.ui.SimpleMoveAnimator;
+import kendzi.josm.kendzi3d.service.TextureCacheService;
+import kendzi.josm.kendzi3d.service.TextureLibraryService;
 import kendzi.josm.kendzi3d.ui.debug.AxisLabels;
 import kendzi.math.geometry.point.PointUtil;
 
@@ -77,11 +79,17 @@ public class Kendzi3dTitleGLEventListener implements GLEventListener {
      */
     private Ground ground;
 
+    /**
+     * Texture cache service.
+     */
+    @Inject
+    private TextureCacheService textureCacheService;
 
-
-
-
-
+    /**
+     * Texture library service.
+     */
+    @Inject
+    private TextureLibraryService textureLibraryService;
 
 
     /**
@@ -90,7 +98,7 @@ public class Kendzi3dTitleGLEventListener implements GLEventListener {
     public Kendzi3dTitleGLEventListener() {
 
 
-        this.ground  = new Ground();
+        this.ground  = new Ground(textureCacheService, textureLibraryService);
 
         this.axisLabels = new AxisLabels();
 
@@ -103,10 +111,10 @@ public class Kendzi3dTitleGLEventListener implements GLEventListener {
     Point2d rightBottomPoint;
 
 
-    private double angleX;
+    private double cameraAngleX;
 
 
-    private double angleY;
+    private double cameraAngleY;
 
 
     @Override
@@ -220,9 +228,9 @@ public class Kendzi3dTitleGLEventListener implements GLEventListener {
         gl.glMaterialfv(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE, grayCol, 0);
 
 
-      
 
-//        this.renderJosm.init(gl);
+
+        //        this.renderJosm.init(gl);
 
     }
 
@@ -255,19 +263,21 @@ public class Kendzi3dTitleGLEventListener implements GLEventListener {
         double areaHeigth =  this.leftTopPoint.y - this.rightBottomPoint.y;
         double areaWidth = this.rightBottomPoint.x - this.leftTopPoint.x;
 
-        this.angleX = Math.toRadians(0);
-        this.angleY = Math.toRadians(-35);
+        //        this.cameraAngleX = Math.toRadians(0);
+        //        this.cameraAngleY = Math.toRadians(-35);
 
-        double ox = Math.cos(this.angleX) * areaWidth / 2d;
-        double oy = Math.cos(this.angleY) * areaHeigth / 2d;
+        double ox = Math.cos(this.cameraAngleX) * areaWidth / 2d;
+        double oy = Math.cos(this.cameraAngleY) * areaHeigth / 2d;
 
-        if (Math.abs(this.angleY)  > Math.toRadians(20)) {
+        if (Math.abs(this.cameraAngleY)  > Math.toRadians(20)) {
             // FIXME !!!
             //            oy = oy * 1.013;
         }
 
-        gl.glOrtho(- ox, ox , -oy, oy, -25
-                , 600);
+        double oz = Math.max(ox, oy);
+
+        gl.glOrtho(- ox, ox , -oy, oy, -oz - 25
+                , oz + 600);
         //        gl.glOrtho(- areaWidth/2, areaWidth/2 , -areaHeigth/2, areaHeigth/2, -10, 100);
 
 
@@ -329,11 +339,11 @@ public class Kendzi3dTitleGLEventListener implements GLEventListener {
         Vector3d posLookAt = new Vector3d(0, 400, 0);
         Vector3d camVector= new Vector3d(0, 0, -1);
 
-        posLookAt = PointUtil.rotateZ3d(posLookAt, -this.angleX);
-        posLookAt = PointUtil.rotateX3d(posLookAt, -this.angleY);
+        posLookAt = PointUtil.rotateZ3d(posLookAt, -this.cameraAngleX);
+        posLookAt = PointUtil.rotateX3d(posLookAt, -this.cameraAngleY);
 
-        camVector = PointUtil.rotateZ3d(camVector, -this.angleX);
-        camVector = PointUtil.rotateX3d(camVector, -this.angleY);
+        camVector = PointUtil.rotateZ3d(camVector, -this.cameraAngleX);
+        camVector = PointUtil.rotateX3d(camVector, -this.cameraAngleY);
         //        posLookAt = PointUtil.rotateX3d(posLookAt, rotate.x);
 
         posLookAt.x += camraCenter.x;
@@ -462,6 +472,50 @@ public class Kendzi3dTitleGLEventListener implements GLEventListener {
      */
     public void setRightBottomPoint(Point2d rightBottomPoint) {
         this.rightBottomPoint = rightBottomPoint;
+    }
+
+
+
+
+
+    /**
+     * @return the cameraAngleX
+     */
+    public double getCameraAngleX() {
+        return cameraAngleX;
+    }
+
+
+
+
+
+    /**
+     * @param cameraAngleX the cameraAngleX to set
+     */
+    public void setCameraAngleX(double cameraAngleX) {
+        this.cameraAngleX = cameraAngleX;
+    }
+
+
+
+
+
+    /**
+     * @return the cameraAngleY
+     */
+    public double getCameraAngleY() {
+        return cameraAngleY;
+    }
+
+
+
+
+
+    /**
+     * @param cameraAngleY the cameraAngleY to set
+     */
+    public void setCameraAngleY(double cameraAngleY) {
+        this.cameraAngleY = cameraAngleY;
     }
 
 

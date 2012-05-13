@@ -23,6 +23,7 @@ import javax.media.opengl.GLPbuffer;
 import javax.media.opengl.GLProfile;
 import javax.vecmath.Point2d;
 
+import jogamp.opengl.Debug;
 import kendzi.jogl.model.render.ModelRender;
 import kendzi.josm.kendzi3d.jogl.Kendzi3dTitleGLEventListener;
 import kendzi.josm.kendzi3d.jogl.RenderJOSM;
@@ -52,7 +53,8 @@ public class RenderTitleMain {
 
     private static void initJOSMMinimal() {
         Main.pref = new Preferences();
-        org.openstreetmap.josm.gui.preferences.map.ProjectionPreference.setProjection();
+        //        org.openstreetmap.josm.gui.preferences.map.ProjectionPreference.setProjection();
+        org.openstreetmap.josm.gui.preferences.projection.ProjectionPreference.setProjection();
     }
     private static void initKendzi3dMinimal(Injector injector) {
         // XXX move to module
@@ -166,9 +168,9 @@ public class RenderTitleMain {
 
         int z = zoom;
 
-        Point c = getCenter(z);
-        int x = c.x;
-        int y = c.y;
+        double cameraAngleX = Double.parseDouble(parms.get(TitleParm.CAMERA_ANGLE_X));
+        double cameraAngleY = Double.parseDouble(parms.get(TitleParm.CAMERA_ANGLE_Y));
+
 
         int a = 0;
 
@@ -184,20 +186,26 @@ public class RenderTitleMain {
         if (dataSetBounds) {
 
             List<Title> titleList = prepareBoundsForDataSet(zoom, dataSet);
-            genTitle(titleList, dataSet, outDir, injector);
+            genTitle(titleList, dataSet, outDir, cameraAngleX, cameraAngleY, injector);
 
-        } else if (a == 0) {
-            genTitle(Arrays.asList(new Title(x, y, z)), dataSet, outDir, injector);
         } else {
+            Point c = getCenter(z);
+            int x = c.x;
+            int y = c.y;
 
-            List<Title> titleList = new ArrayList<RenderTitleMain.Title>();
-            for (int xi = x - a; xi < x + a; xi++ ) {
-                for (int yi = y - a; yi < y + a; yi++ ) {
-                    Title t = new Title(xi, yi, z);
-                    titleList.add(t);
+            if (a == 0) {
+                genTitle(Arrays.asList(new Title(x, y, z)), dataSet, outDir, cameraAngleX, cameraAngleY, injector);
+            } else {
+
+                List<Title> titleList = new ArrayList<RenderTitleMain.Title>();
+                for (int xi = x - a; xi < x + a; xi++ ) {
+                    for (int yi = y - a; yi < y + a; yi++ ) {
+                        Title t = new Title(xi, yi, z);
+                        titleList.add(t);
+                    }
                 }
+                genTitle(titleList, dataSet, outDir, cameraAngleX, cameraAngleY, injector);
             }
-            genTitle(titleList, dataSet, outDir, injector);
         }
     }
     /**
@@ -297,7 +305,8 @@ public class RenderTitleMain {
         }
     }
 
-    public static void genTitle(List<Title> pTitleList, DataSet dataSet, String outDir, Injector injector) {
+    public static void genTitle(
+            List<Title> pTitleList, DataSet dataSet, String outDir, double cameraAngleX, double cameraAngleY, Injector injector) {
 
         GLContext context = null;
         GLPbuffer buf = null;
@@ -308,7 +317,7 @@ public class RenderTitleMain {
         int bufw = 0;
         int bufh = 0;
 
-        System.out.println("is set debug for GraphicsConfiguration: " + com.jogamp.opengl.impl.Debug.debug("GraphicsConfiguration"));
+        System.out.println("is set debug for GraphicsConfiguration: " + Debug.debug("GraphicsConfiguration"));
 
         final GLProfile gl2Profile = GLProfile.get(GLProfile.GL2);
 
@@ -365,10 +374,10 @@ public class RenderTitleMain {
         //Disable the using of OpenGL or at least by way of a Pbuffer
         context.makeCurrent();
 
-
-        //        GL2 gl = buf.getGL().getGL2();
-
         ff.init(buf);
+        ff.setCameraAngleX(cameraAngleX);
+        ff.setCameraAngleY(cameraAngleY);
+
 
         for (Title t : pTitleList) {
             generateTitle(t.getX(), t.getY(), t.getZ(), buf, bufw, bufh, ff
@@ -394,6 +403,7 @@ public class RenderTitleMain {
      * @param ff
      * @param width
      * @param height
+     * @param outDir
      */
     public static void generateTitle(int x, int y, int z, GLPbuffer buf,
             int bufw, int bufh, Kendzi3dTitleGLEventListener ff, int width, int height,

@@ -1,25 +1,26 @@
 package kendzi.josm.kendzi3d.title;
+
 enum TitleParm {
 
-        DATA_SET_BOUNDS("dataSetBounds"),
-        IN_FILE("inFile"),
-        OUT_DIR("outDir"),
-        RES_DIR("resDir"),
-        RENDER_PROPERTIES("renderProperties"),
-        X("x"),
-        Y("y"),
-        ZOOM("zoom");
+    CAMERA_ANGLE_X("cameraAngleX"),
+    CAMERA_ANGLE_Y("cameraAngleY"),
+    DATA_SET_BOUNDS("dataSetBounds"),
+    IN_FILE("inFile"),
+    OUT_DIR("outDir"),
+    RES_DIR("resDir"),
+    RENDER_PROPERTIES("renderProperties"),
+    X("x"), Y("y"), ZOOM("zoom");
 
-        String parm;
+    String parm;
 
-        TitleParm(String pParm) {
-            this.parm = pParm;
-        }
-
-        /**
-         * @return the parm
-         */
-        public String getParm() {
-            return parm;
-        }
+    TitleParm(String pParm) {
+        this.parm = pParm;
     }
+
+    /**
+     * @return the parm
+     */
+    public String getParm() {
+        return parm;
+    }
+}
